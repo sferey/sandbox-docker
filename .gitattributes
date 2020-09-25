@@ -1,0 +1,4 @@
+*.md export-ignore
+.* export-ignore
+devops/ export-ignore
+Makefile export-ignore

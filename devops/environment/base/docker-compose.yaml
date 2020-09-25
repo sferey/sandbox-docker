@@ -1,0 +1,31 @@
+version: '3.7'
+
+# infrastructure
+x-base: &base
+  context: "${APP_DIR:?}/devops/environment/base"
+  args:
+    image_archive: "${COMPOSE_PROJECT_NAME:?}/archive"
+    image_php: "${COMPOSE_PROJECT_NAME:?}/php"
+    image_phpqa: "${IMAGE_PHPQA:?}"
+    image_nginx: "${IMAGE_NGINX:?}"
+
+# application
+services:
+  app:
+    build:
+      <<: *base
+      target: "app-${STAGING_ENV:?}"
+    secrets: [json_bucket, env_bucket]
+    command: [sh, -c, "set -a && . /run/secrets/env_bucket && php-fpm"]
+
+  web:
+    build:
+      <<: *base
+      target: web
+    depends_on: [app]
+
+secrets:
+  json_bucket:
+    file: ./secrets/bucket.json
+  env_bucket:
+    file: ./secrets/bucket.env
